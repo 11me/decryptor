@@ -60,6 +60,7 @@ func main() {
 	r := mux.NewRouter()
 
 	origins := handlers.AllowedOrigins([]string{"*"})
+	methods := handlers.AllowedMethods([]string{"*"})
 	headers := handlers.AllowedHeaders([]string{"*"})
 
 	r.HandleFunc("/decrypt", handleRSA).Methods(http.MethodPost)
@@ -78,5 +79,5 @@ func main() {
 	}
 	addr := fmt.Sprintf("0.0.0.0:%s", port)
 
-	http.ListenAndServe(addr, handlers.CORS(origins, headers)(r))
+	http.ListenAndServe(addr, handlers.CORS(origins, methods, headers)(r))
 }
