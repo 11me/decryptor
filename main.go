@@ -5,7 +5,8 @@ import (
 	"crypto/sha1"
 	"crypto/x509"
 	"encoding/pem"
-	"io"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -24,14 +25,14 @@ func handleRSA(w http.ResponseWriter, r *http.Request) {
 	fkey, _, err := r.FormFile("key")
 	handleErr(err)
 
-	privKey, err := io.ReadAll(fkey)
+	privKey, err := ioutil.ReadAll(fkey)
 	handleErr(err)
 
 	// parse secret
 	secret, _, err := r.FormFile("secret")
 	handleErr(err)
 
-	secretMsg, err := io.ReadAll(secret)
+	secretMsg, err := ioutil.ReadAll(secret)
 	handleErr(err)
 
 	// decrypt message
@@ -42,7 +43,7 @@ func handleRSA(w http.ResponseWriter, r *http.Request) {
 	res, err := rsa.DecryptOAEP(sha1.New(), nil, pkey, secretMsg, nil)
 	handleErr(err)
 
-	io.WriteString(w, string(res))
+	fmt.Fprint(w, string(res))
 }
 
 func handleErr(err error) {
