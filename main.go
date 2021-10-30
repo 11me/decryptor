@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -59,7 +60,17 @@ func main() {
 	origins := handlers.AllowedOrigins([]string{"*"})
 	headers := handlers.AllowedHeaders([]string{"*"})
 
-	r.HandleFunc("/", handleRSA).Methods(http.MethodPost)
+	r.HandleFunc("/decrypt", handleRSA).Methods(http.MethodPost)
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Hello!")
+	})
 
-	http.ListenAndServe("0.0.0.0:8080", handlers.CORS(origins, headers)(r))
+	// lookup port
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "8080"
+	}
+	addr := fmt.Sprintf("0.0.0.0:%s", port)
+
+	http.ListenAndServe(addr, handlers.CORS(origins, headers)(r))
 }
