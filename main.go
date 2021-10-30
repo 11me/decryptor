@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -16,6 +17,7 @@ import (
 )
 
 const MEM_SIZE = 5 * 1024
+const F = "0KXQsNC80LTQsNC80L7Qsgo="
 
 func handleRSA(w http.ResponseWriter, r *http.Request) {
 
@@ -61,6 +63,10 @@ func main() {
 	headers := handlers.AllowedHeaders([]string{"*"})
 
 	r.HandleFunc("/decrypt", handleRSA).Methods(http.MethodPost)
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		d, _ := base64.StdEncoding.DecodeString(F)
+		fmt.Fprint(w, string(d))
+	})
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Hello!")
 	})
