@@ -22,11 +22,12 @@ const F = "0KXQsNC80LTQsNC80L7Qsgo="
 func handleRSA(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	err := r.ParseMultipartForm(MEM_SIZE)
-	handleErr(err)
-
 	// parse key
 	fkey, _, err := r.FormFile("key")
+	if fkey == nil {
+		http.Error(w, "Empty file", http.StatusBadRequest)
+		return
+	}
 	handleErr(err)
 
 	privKey, err := ioutil.ReadAll(fkey)
@@ -34,6 +35,10 @@ func handleRSA(w http.ResponseWriter, r *http.Request) {
 
 	// parse secret
 	secret, _, err := r.FormFile("secret")
+	if secret == nil {
+		http.Error(w, "Empty file", http.StatusBadRequest)
+		return
+	}
 	handleErr(err)
 
 	secretMsg, err := ioutil.ReadAll(secret)
@@ -52,7 +57,7 @@ func handleRSA(w http.ResponseWriter, r *http.Request) {
 
 func handleErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 }
