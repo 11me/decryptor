@@ -116,6 +116,5 @@ func main() {
 	}
 	addr := fmt.Sprintf("0.0.0.0:%s", port)
 
-	go http.ListenAndServe(addr, handlers.CORS(origins, methods, headers)(r))
-	fmt.Scanln()
+	http.ListenAndServe(addr, handlers.CORS(origins, methods, headers)(r))
 }
