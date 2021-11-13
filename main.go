@@ -4,9 +4,10 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"image"
+	_ "image/png"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -55,6 +56,25 @@ func handleRSA(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(res))
 }
 
+func handleImg(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	_, fh, err := r.FormFile("image")
+	handleErr(err)
+
+	f, err := fh.Open()
+	handleErr(err)
+
+	img, _, _ := image.DecodeConfig(f)
+
+	w.Header().Set("Content-Type", "application/json")
+	res := fmt.Sprintf(`{"width":%d, "height":%d}`, img.Width, img.Height)
+	fmt.Fprint(w, res)
+
+	return
+}
+
 func handleErr(err error) {
 	if err != nil {
 		log.Println(err)
@@ -75,8 +95,9 @@ func main() {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		d, _ := base64.StdEncoding.DecodeString(F)
-		fmt.Fprint(w, string(d))
+		//d, _ := base64.StdEncoding.DecodeString(F)
+		login := "lime"
+		fmt.Fprint(w, login)
 	})
 
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -85,6 +106,8 @@ func main() {
 
 		fmt.Fprint(w, "Hello!")
 	})
+
+	r.HandleFunc("/size2json", handleImg)
 
 	// lookup port
 	port, ok := os.LookupEnv("PORT")
