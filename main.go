@@ -107,7 +107,7 @@ func main() {
 		fmt.Fprint(w, "Hello!")
 	})
 
-	r.HandleFunc("/size2json", handleImg)
+	r.HandleFunc("/size2json", handleImg).Methods(http.MethodPost)
 
 	// lookup port
 	port, ok := os.LookupEnv("PORT")
